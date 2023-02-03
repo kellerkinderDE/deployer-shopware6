@@ -2,10 +2,10 @@
 This repository contains a [deployer](https://deployer.org/) configuration for Shopware 6.
 
 ## Usage
-Copy the contents of this repository to a folder inside your project.
+Copy the contents of the `example` subfolder in this repository into your project and/or modify it to suit your needs.
 
-Enter the following to your `.gitlab-ci.yml` or adjust it to your ci syntax.
-You have to place the files in a folder called `.deployment`.
+Paste the following into your `.gitlab-ci.yml` or adapt it to your ci syntax.
+You will need to place the files in a folder called `.deployment`.
 
 ### Assumptions
 * We assume that the `js` files have already been built in the CI and published to the deployment jobs via artifacts.
@@ -28,7 +28,7 @@ variables:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
 
-staging-deploy:
+deploy-staging:
   <<: *deployment
   only:
     refs:
