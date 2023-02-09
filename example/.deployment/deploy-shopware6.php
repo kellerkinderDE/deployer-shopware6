@@ -45,10 +45,10 @@ task('shopware6:plugins:install_update', function (): void {
     run('cd {{release_path}} && {{bin/php}} {{console}} cache:clear');
 });
 
-task('shopware6:update', function (): void { // highly experimental
+task('shopware6:update', function (): void { // experimental
     run('cd {{release_path}} && [ ! -f vendor/autoload.php ] || {{bin/php}} {{console}} system:update:prepare');
     run('cd {{release_path}} && [ ! -f vendor/autoload.php ] || {{bin/php}} {{console}} system:update:finish --skip-asset-build');
-});
+})->desc('Executes migrations and other defined update stuff');
 
 task('shopware6:messenger:stop', function (): void {
     if (has('previous_release')) {

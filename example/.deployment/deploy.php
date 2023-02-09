@@ -67,7 +67,7 @@ task('deploy', [
     'deploy:shared',
     'deploy:writable',
     'shopware6:plugins:install_update',
-//    'shopware6:update', // TODO: needs to be verified
+    'shopware6:update',
     'shopware6:bundle:dump',
     'shopware6:theme:compile',
     'deploy:symlink',
