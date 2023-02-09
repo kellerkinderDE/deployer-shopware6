@@ -60,7 +60,10 @@ task('shopware6:bundle:dump', function (): void {
     run('cd {{release_path}} && {{bin/php}} {{console}} bundle:dump');
 });
 
-/** @see https://developer.shopware.com/docs/guides/hosting/installation-updates/deployments/build-w-o-db#compiling-the-storefront-without-database */
+/**
+ * Only required if your CI is not able to compile the themes
+ * @see https://developer.shopware.com/docs/guides/hosting/installation-updates/deployments/build-w-o-db#compiling-the-storefront-without-database
+ */
 task('shopware6:theme:compile', function (): void {
     run('cd {{release_path}} && {{bin/php}} {{console}} theme:compile');
 });

@@ -69,7 +69,7 @@ task('deploy', [
     'shopware6:plugins:install_update',
 //    'shopware6:update', // TODO: needs to be verified
     'shopware6:bundle:dump',
-//    'shopware6:theme:compile',  // Only required if your CI is not able to compile the themes
+    'shopware6:theme:compile',
     'deploy:symlink',
     'shopware6:messenger:stop',
     'cachetool:clear:opcache',
