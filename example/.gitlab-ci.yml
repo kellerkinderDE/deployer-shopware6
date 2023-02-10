@@ -15,7 +15,6 @@ variables:
   PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true" # needed to build the js files inside the ci
   MY_DEPLOYMENT_IP: "127.0.0.1" # adjust according to your needs - if your IPs of the stage and live system differ - you might want to enter the IP directly for each CI job
 
-
 .composer: &composer
   stage: build-composer
   image: "kellerkinder/pipeline-image:8.1"
