@@ -2,14 +2,14 @@
 This repository contains a [deployer](https://deployer.org/) configuration for Shopware 6.
 
 ## Usage
-Copy the contents of the `example` subfolder in this repository into your project and/or modify it to suit your needs.
+Copy the entire `.deployment` directory from the `example` directory of this repository into your project and modify it to suit your needs.
 
 Paste the following into your `.gitlab-ci.yml` or adapt it to your ci syntax.
 You will need to place the files in a folder called `.deployment`.
 
 ### Assumptions
 * We assume that the `js` files have already been built in the CI and published to the deployment jobs via artifacts.
-* We assume in the CI that the theme is already compiled. For more information, see [here] (https://developer.shopware.com/docs/guides/hosting/installation-updates/deployments/build-w-o-db#compiling-the-storefront-without-database).
+* We assume in the CI that your shop is prepared for compilation without database. For more information, see [here] (https://developer.shopware.com/docs/guides/hosting/installation-updates/deployments/build-w-o-db#compiling-the-storefront-without-database).
 * We assume that any plugin is required via the composer and/or placed in `static/plugins`.
 ```yaml
 variables:
@@ -53,7 +53,7 @@ deploy-production:
 ### `inventory.yml`
 #### Required adjustments
 * `cachetool` => Needs to be the path of your php socket - if you want to use `cachetool:clear:opcache` in the deployment steps
-* `deploy_path` => Needs to be the path of your webroot
+* `deploy_path` => The path where the deployment should be setup on the server
 * `user` & `hostname` should be changed according to your data
 
 #### Optional adjustments
@@ -90,9 +90,9 @@ deploy-production:
 * You should compile your js/scss files during your ci runtime
 * Composer installs/updates/requirements should be done before the deployment starts
 
-* Directories on the server within your deployment path `deployer` will create several directories:
+* `deployer` will create several directories in your deployment path on the server:
   * `.dep`: Information about the releases
-  * `current`: Symlink that will always be linked to the latest release.
+  * `current`: Symlink that will always be linked to the latest release. Use it for your document root.
   * `releases`: This directory contains the last 5 releases. If you want to keep more or less releases, simply overwrite the `keep_releases` setting as stated above.
   * `shared/`: Here you can add additional files that will persist between deployments (like the already shared `.env` or `.htaccess`)
 
