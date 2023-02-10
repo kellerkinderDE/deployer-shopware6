@@ -4,50 +4,12 @@ This repository contains a [deployer](https://deployer.org/) configuration for S
 ## Usage
 Copy the entire `.deployment` directory from the `example` directory of this repository into your project and modify it to suit your needs.
 
-Paste the following into your `.gitlab-ci.yml` or adapt it to your ci syntax.
-You will need to place the files in a folder called `.deployment`.
+Use [`.gitlab-ci.yml`](./example/.gitlab-ci.yml) as an example and/or adapt it to your ci syntax.
 
 ### Assumptions
 * We assume that the `js` files have already been built in the CI and published to the deployment jobs via artifacts.
-* We assume in the CI that your shop is prepared for compilation without database. For more information, see [here] (https://developer.shopware.com/docs/guides/hosting/installation-updates/deployments/build-w-o-db#compiling-the-storefront-without-database).
+* We assume in the CI that your shop is prepared for compilation without database. For more information, see [here](https://developer.shopware.com/docs/guides/hosting/installation-updates/deployments/build-w-o-db#compiling-the-storefront-without-database).
 * We assume that any plugin is required via the composer and/or placed in `static/plugins`.
-```yaml
-variables:
-  DOCKER_DRIVER: overlay2
-  CI: "1" # use `bin/ci` instead of `bin/console`
-  SHOPWARE_SKIP_THEME_COMPILE: "true" # needed to build the js files inside the ci
-  PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true" # needed to build the js files inside the ci
-  MY_DEPLOYMENT_IP: "127.0.0.1" # adjust according to your needs - if your IPs of the stage and live system differ - you might want to enter the IP directly for each CI job
-
-.deployment: &deployment
-  image: "kellerkinder/pipeline-image:8.1"
-  stage: deploy
-  before_script:
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - # here we add our private key to the ssh config
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-
-deploy-staging:
-  <<: *deployment
-  only:
-    refs:
-      - staging
-  script:
-    - ssh-keyscan -H $MY_DEPLOYMENT_IP >> ~/.ssh/known_hosts # you may want to use a CI variable for the host key and write that to known_hosts
-    - cd ${CI_PROJECT_DIR}/.deployment && composer install -no
-    - php vendor/bin/dep deploy staging -vvv
-
-deploy-production:
-  <<: *deployment
-  only:
-    refs:
-      - main # or master, depending on your repository
-  script:
-    - ssh-keyscan -H $MY_DEPLOYMENT_IP >> ~/.ssh/known_hosts # you may want to use a CI variable for the host key and write that to known_hosts
-    - cd ${CI_PROJECT_DIR}/.deployment && composer install -no
-    - php vendor/bin/dep deploy production -vvv
-```
 
 ## Configuration
 ### `inventory.yml`
