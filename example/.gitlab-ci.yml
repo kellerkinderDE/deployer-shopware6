@@ -1,0 +1,109 @@
+stages:
+  - build-composer
+  - build-js
+  - deploy
+
+cache:
+  key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+
+variables:
+  SW_COMPOSER_TOKEN: "You may want to add this as a pipeline secret"
+  SSH_PRIVATE_KEY: "You may want to add this as a pipeline secret"
+  DOCKER_DRIVER: overlay2
+  CI: "1" # use `bin/ci` instead of `bin/console`
+  SHOPWARE_SKIP_THEME_COMPILE: "true" # needed to build the js files inside the ci
+  PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true" # needed to build the js files inside the ci
+  MY_DEPLOYMENT_IP: "127.0.0.1" # adjust according to your needs - if your IPs of the stage and live system differ - you might want to enter the IP directly for each CI job
+
+.composer: &composer
+  stage: build-composer
+  image: "kellerkinder/pipeline-image:8.1"
+  before_script:
+    - composer config bearer.packages.shopware.com $SW_COMPOSER_TOKEN
+  artifacts:
+    expire_in: '600'
+    paths:
+      - auth.json
+      - composer.json
+      - composer.lock
+      - vendor
+
+.build-js: &build-js
+  stage: build-js
+  image: "kellerkinder/pipeline-image:PHP_8.1-NODE_16"
+  variables:
+    DATABASE_URL: ''
+    SHOPWARE_SKIP_BUNDLE_DUMP: '1'
+  before_script:
+    - sudo chown docker:docker -R bin auth.json vendor/yourPluginVendor # adjust those paths according to your needs (keep in mind that the owner might differ from the executing user)
+    - ./bin/ci bundle:dump
+  artifacts:
+    expire_in: '600'
+    untracked: true
+    paths:
+      - auth.json
+      - composer.json
+      - composer.lock
+      - public
+      - vendor
+
+.deployment: &deployment
+  image: "kellerkinder/pipeline-image:8.1"
+  stage: deploy
+  needs: [ deploy-build-js ]
+  before_script:
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H $MY_DEPLOYMENT_IP >> ~/.ssh/known_hosts
+    - cd ${CI_PROJECT_DIR}/.deployment && composer install -no
+
+composer:
+  <<: *composer
+  except:
+    refs:
+      - main
+  script:
+    - cd ${CI_PROJECT_DIR} && composer install --no-interaction --optimize-autoloader --no-scripts --ignore-platform-reqs
+
+test-build-js:
+  <<: *build-js
+  only:
+    changes:
+      - "**/*.js"
+      - "**/*.json"
+      - "**/*.scss"
+      - "**/*.css"
+  except:
+    refs:
+      - develop
+      - main
+  needs: [ composer ]
+  script:
+    - ./bin/build-js.sh
+
+deploy-build-js:
+  <<: *build-js
+  only:
+    refs:
+      - develop
+  needs: [ composer ]
+  script:
+    - ./bin/build-js.sh
+
+deploy-staging:
+  <<: *deployment
+  only:
+    refs:
+      - develop
+  script:
+    - php vendor/bin/dep deploy staging -vvv
+
+deploy-production:
+  <<: *deployment
+  only:
+    refs:
+      - main
+  script:
+    - php vendor/bin/dep deploy production -vvv
