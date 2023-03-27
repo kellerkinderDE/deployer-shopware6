@@ -7,9 +7,9 @@ Copy the entire `.deployment` directory from the `example` directory of this rep
 Use [`.gitlab-ci.yml`](./example/.gitlab-ci.yml) as an example and/or adapt it to your ci syntax.
 
 ### Assumptions
-* We assume that the `js` files have already been built in the CI and published to the deployment jobs via artifacts.
-* We assume in the CI that your shop is prepared for compilation without database. For more information, see [here](https://developer.shopware.com/docs/guides/hosting/installation-updates/deployments/build-w-o-db#compiling-the-storefront-without-database).
-* We assume that any plugin is required via the composer and/or placed in `static/plugins`.
+* We assume that the `js` files will be built in CI and published to the deployment jobs via artifacts.
+* We assume that your shop is prepared for compilation without a database in CI. For more information, see [here](https://developer.shopware.com/docs/guides/hosting/installation-updates/deployments/build-w-o-db#compiling-the-storefront-without-database).
+* We assume that all plugins are required via composer (custom plugins are placed in `custom/static-plugins`).
 
 ## Configuration
 ### `inventory.yml`
