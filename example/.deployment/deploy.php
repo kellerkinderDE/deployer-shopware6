@@ -44,7 +44,6 @@ add('writable_dirs', [
     'public',
 ]);
 set('allow_anonymous_stats', false);
-set('ssh_multiplexing', false);
 set('timing', new \DateTime());
 set('default_timeout', 600);
 set('keep_releases', 5);
